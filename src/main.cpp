@@ -1,18 +1,34 @@
 #include <Arduino.h>
-
-// put function declarations here:
-int myFunction(int, int);
+#include <Wire.h>
+#include "pyranometer_value.h"
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(9600);
+  initPyranometer();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  float voltage = readVoltage();
+  float irradiance  = readIrradiance();
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  Serial.print("Voltage: ");
+  Serial.print(voltage, 4);
+
+  Serial.print(" V  |  Irradiance: ");
+  Serial.print(irradiance, 2);
+  Serial.println(" W/m²");
+
+  /************************************************** */
+  String status = getSunStatus(irradiance);
+Serial.println("Sun Status: " + status);
+
+
+  if (irradiance >= 200) {
+    turnRelayON();
+    Serial.println("Relay: ON");
+  } else {
+    turnRelayOFF();
+    Serial.println("Relay: OFF");
+  }
+  delay(1000);
 }
